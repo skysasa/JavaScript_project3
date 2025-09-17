@@ -1,4 +1,4 @@
-const API_KEY = `8326ff18cc064d39a0460f49562eb7d3`;
+const API_KEY = `비밀`;
 let newsList = [];
 const getLatesNews = async () => {
   url = new URL(
@@ -51,7 +51,7 @@ const render = () => {
       return `<div class="row news">
           <div class="col-lg-4">
             <img
-              class="news-img-size"
+              class="news-img-size news-info"
               src="${imageURL}"
             />
           </div>
