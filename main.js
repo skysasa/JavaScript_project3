@@ -61,9 +61,7 @@ const render = () => {
       // } // 간단한 버전은
       let checkSource = news.source.name || "no source";
 
-      let timeFormat = moment(news.publishedAt).format(
-        "MMMM Do YYYY, h:mm:ss a"
-      );
+      let timeFormat = moment(news.publishedAt).startOf("day").fromNow();
 
       return `<div class="row news">
           <div class="col-lg-4">
