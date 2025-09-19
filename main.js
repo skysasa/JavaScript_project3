@@ -17,6 +17,15 @@ const openSearchBox = () => {
 
 const API_KEY = `비밀`;
 let newsList = [];
+const menus = document.querySelectorAll(".menus button");
+//console.log("buttons", menus);
+menus.forEach((menu) =>
+  menu.addEventListener("click", (event) => getNewsByCategory(event))
+);
+const sidemenus = document.querySelectorAll(".side-menu-list button");
+sidemenus.forEach((sidemenu) =>
+  sidemenu.addEventListener("click", (event) => getNewsByCategory(event))
+);
 const getLatesNews = async () => {
   url = new URL(
     `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&apiKey=${API_KEY}`
@@ -31,6 +40,31 @@ const getLatesNews = async () => {
   console.log("ddd", newsList);
 };
 
+const getNewsByCategory = async (event) => {
+  const category = event.target.textContent.toLowerCase();
+  const url = new URL(
+    `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`
+  );
+  console.log("Category", category);
+  const response = await fetch(url);
+  const data = await response.json();
+  console.log("data", data);
+  newsList = data.articles;
+  render();
+};
+
+const getNewsByKeyword = async () => {
+  const keyword = document.getElementById("search-input").value;
+  console.log("keyword", keyword);
+  const url = new URL(
+    `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${keyword}&apiKey=${API_KEY}`
+  );
+  const response = await fetch(url);
+  const data = await response.json();
+  console.log("data", data);
+  newsList = data.articles;
+  render();
+};
 const render = () => {
   const newsHTML = newsList
     .map((news) => {
@@ -81,3 +115,7 @@ const render = () => {
   document.getElementById(`news-board`).innerHTML = newsHTML;
 };
 getLatesNews();
+
+//클릭이벤트
+//뉴스 카테고리별 가져오기
+//뉴스 보여주기
