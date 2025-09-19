@@ -7,7 +7,8 @@ function closeNav() {
 }
 
 const openSearchBox = () => {
-  let inputArea = document.getElementById("input-area");
+  inputArea = document.getElementById("input-area");
+
   if (inputArea.style.display === "inline") {
     inputArea.style.display = "none";
   } else {
@@ -26,44 +27,64 @@ const sidemenus = document.querySelectorAll(".side-menu-list button");
 sidemenus.forEach((sidemenu) =>
   sidemenu.addEventListener("click", (event) => getNewsByCategory(event))
 );
+
+let url = new URL(
+  `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&apiKey=${API_KEY}`
+);
+
+const getNews = async () => {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    if (response.status === 200) {
+      if (data.articles.length === 0) {
+        throw new Error("No result for this search");
+      }
+      newsList = data.articles;
+      render();
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (error) {
+    errorRender(error.message);
+  }
+};
+
 const getLatesNews = async () => {
+  // url = new URL(
+  //   `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&apiKey=${API_KEY}`
+  //); 마찬가지로 URL 위에 뺴주었기에  const 지우고 url 전역변수는 모두가 사용 가능한 변수
   url = new URL(
     `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&apiKey=${API_KEY}`
   );
+
   //   console.log("uuu", url);
   //fetch 호출 정보를 가져올려는 함수
   //async(비동기 함수 처리) - await (데이터 받을때 까지 기다려주는것)
-  const response = await fetch(url);
-  const data = await response.json();
-  newsList = data.articles;
-  render();
+  // const response = await fetch(url);
+  // const data = await response.json();
+  // newsList = data.articles;
+  // render(); >> 중복사용대신 깔끔하게 getNews() 부른다
+  getNews();
   console.log("ddd", newsList);
 };
 
 const getNewsByCategory = async (event) => {
   const category = event.target.textContent.toLowerCase();
-  const url = new URL(
+  url = new URL(
     `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`
   );
   console.log("Category", category);
-  const response = await fetch(url);
-  const data = await response.json();
-  console.log("data", data);
-  newsList = data.articles;
-  render();
+  getNews();
 };
 
 const getNewsByKeyword = async () => {
   const keyword = document.getElementById("search-input").value;
   console.log("keyword", keyword);
-  const url = new URL(
+  url = new URL(
     `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&q=${keyword}&apiKey=${API_KEY}`
   );
-  const response = await fetch(url);
-  const data = await response.json();
-  console.log("data", data);
-  newsList = data.articles;
-  render();
+  getNews();
 };
 const render = () => {
   const newsHTML = newsList
@@ -114,8 +135,12 @@ const render = () => {
     .join("");
   document.getElementById(`news-board`).innerHTML = newsHTML;
 };
-getLatesNews();
 
-//클릭이벤트
-//뉴스 카테고리별 가져오기
-//뉴스 보여주기
+const errorRender = (errorMessage) => {
+  const errorHTML = `<div class="alert alert-danger" role="alert">
+  ${errorMessage}
+</div>`;
+  document.getElementById("news-board").innerHTML = errorHTML;
+};
+
+getLatesNews();
