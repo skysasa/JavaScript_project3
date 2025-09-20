@@ -128,6 +128,20 @@ body {
   text-align: center;
 }
 
+.pagination {
+  margin-top: 1em;
+  justify-content: center;
+}
+.pagination .page-link {
+  color: black;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #a6c5f0;
+  border-color: #a6c5f0;
+  color: #fff;
+}
+
 @media screen and (max-width: 768px) {
   .menus {
     display: none;

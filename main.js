@@ -32,16 +32,26 @@ let url = new URL(
   `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&apiKey=${API_KEY}`
 );
 
+let totalResults = 0;
+let page = 1;
+const pageSize = 10;
+const groupSize = 5;
+
 const getNews = async () => {
   try {
+    url.searchParams.set("page", page); //=> &page = page
+    url.searchParams.set("pageSize", pageSize);
     const response = await fetch(url);
+
     const data = await response.json();
     if (response.status === 200) {
       if (data.articles.length === 0) {
         throw new Error("No result for this search");
       }
       newsList = data.articles;
+      totalResults = data.totalResults;
       render();
+      paginationRender();
     } else {
       throw new Error(data.message);
     }
@@ -143,4 +153,46 @@ const errorRender = (errorMessage) => {
   document.getElementById("news-board").innerHTML = errorHTML;
 };
 
+const paginationRender = () => {
+  //totalResult
+  //page
+  //pagesize
+  //totalpages
+  const totalPages = Math.ceil(totalResults / pageSize);
+  //groupsize
+  //pageGroup
+  const pageGroup = Math.ceil(page / groupSize);
+
+  //last page
+  const lastPage = pageGroup * groupSize;
+  if (lastPage > totalPages) {
+    lastPage = totalPages;
+  }
+  //first page
+  const firstPage =
+    lastPage - (groupSize - 1) <= 0 ? 1 : lastPage - (groupSize - 1);
+
+  let paginationHTML = ` <li class='page-item ${page === 1 ? "disabled" : ""}'>
+      <a class='page-link' onClick="moveToPage(${page - 1})"  href='#'>
+        Previous
+      </a>
+    </li>`;
+  for (let i = firstPage; i <= lastPage; i++) {
+    paginationHTML += ` <li class="page-item ${
+      i === page ? "active" : ""
+    }" onClick="moveToPage(${i})"><a class="page-link" href='#' >${i}</a></li>`;
+  }
+  paginationHTML += ` <li class='page-item'>
+      <a class='page-link' onClick="moveToPage(${page + 1})" href='#'>
+        Next
+      </a>
+    </li>`;
+  document.querySelector(".pagination").innerHTML = paginationHTML;
+};
+
+const moveToPage = (pageNum) => {
+  //console.log("movetoPage", pageNum);
+  page = pageNum;
+  getNews();
+};
 getLatesNews();
